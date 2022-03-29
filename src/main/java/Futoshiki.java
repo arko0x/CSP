@@ -38,16 +38,21 @@ public class Futoshiki {
                 char character = numericChars.charAt(i);
                 variables.add(character == 'x' ? null : Character.getNumericValue(character));
             }
-            System.out.println();
+            for (int i = 0; i < numericChars.length(); i++) {
+                List<Integer> domainValuesList = new LinkedList<>();
+                for (int j = 0; j < n; j++) {
+                    domainValuesList.add(j + 1);
+                }
+                domain.put(i, domainValuesList);
+            }
 
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n - 1; j++) {
-                    System.out.println(i * numberOfLines + j);
                     if (constraintChars.charAt(i * numberOfLines + j) == '>') {
-                        constraints.put(Pair.with(i * n + j, i * n + j + 1), Comparator.comparingInt(e -> e));
+                        constraints.put(Pair.with(i * n + j, i * n + j + 1), Comparator.comparingInt(Integer::intValue));
                     }
                     if (constraintChars.charAt(i * numberOfLines + j) == '<') {
-                        constraints.put(Pair.with(i * n + j, i * n + j + 1), Comparator.comparingInt(e -> e));
+                        constraints.put(Pair.with(i * n + j, i * n + j + 1), Comparator.comparingInt(Integer::intValue).reversed());
                     }
                 }
             }
@@ -55,14 +60,13 @@ public class Futoshiki {
             for (int i = 0; i < n - 1; i++) {
                 for (int j = 0; j < n; j++) {
                     if (constraintChars.charAt(numberOfLines - n + i * numberOfLines + j) == '>') {
-                        constraints.put(Pair.with(i * n + j, i * n + n + j), Comparator.comparingInt(e -> e));
+                        constraints.put(Pair.with(i * n + j, i * n + n + j), Comparator.comparingInt(Integer::intValue));
                     }
                     if (constraintChars.charAt(numberOfLines - n + i * numberOfLines + j) == '<') {
-                        constraints.put(Pair.with(i * n + j, i * n + n + j), Comparator.comparingInt(e -> e));
+                        constraints.put(Pair.with(i * n + j, i * n + n + j), Comparator.comparingInt(Integer::intValue).reversed());
                     }
                 }
             }
-            System.out.println();
 
 //            char[] charArray = numericChars.toCharArray();
 //
@@ -107,7 +111,71 @@ public class Futoshiki {
         }
     }
 
-    private boolean isGreaterThan(int x, int y) {
+    private boolean areRowsValid(List<Integer> solution) {
+        boolean validity;
+        for (int i = 0; i < n; i++) {
+            List<Integer> row = solution.subList(i, i * n + n);
+            validity = row.stream().distinct().count() <= n
+                    && row.stream().filter(Objects::nonNull).count() == row.stream().filter(Objects::nonNull).distinct().count()
+                    && row.stream().filter(Objects::nonNull).max(Comparator.comparingInt(Integer::intValue)).orElse(1) <= n
+                    && row.stream().filter(Objects::nonNull).min(Comparator.comparingInt(Integer::intValue)).orElse(n) >= 1;
+            if (!validity) {
+                return false;
+            }
+        }
         return true;
+    }
+
+    private boolean areColumnsValid(List<Integer> solution) {
+        boolean validity;
+        for (int i = 0; i < n; i++) {
+            List<Integer> column = new LinkedList<>();
+            for (int j = 0; j < n; j++) {
+                column.add(solution.get(j * n + i));
+            }
+            validity = column.stream().distinct().count() <= n
+                    && column.stream().filter(Objects::nonNull).count() == column.stream().filter(Objects::nonNull).distinct().count()
+                    && column.stream().filter(Objects::nonNull).max(Comparator.comparingInt(Integer::intValue)).orElse(1) <= n
+                    && column.stream().filter(Objects::nonNull).min(Comparator.comparingInt(Integer::intValue)).orElse(n) >= 1;
+            if (!validity) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean checkConstraints(List<Integer> solution) {
+        return constraints.keySet()
+                .stream()
+                .filter(indexPair -> constraints.get(indexPair).compare(solution.get(indexPair.getValue0()), solution.get(indexPair.getValue1())) > 0)
+                .count() == constraints.keySet().size();
+    }
+
+    private boolean isSolutionValid(List<Integer> solution) {
+        return areRowsValid(solution) && areColumnsValid(solution) && checkConstraints(solution);
+    }
+
+    private boolean isFinalSolution(List<Integer> solution) {
+        if (isSolutionValid(solution)) {
+            return solution.stream().filter(Objects::nonNull).count() == solution.size();
+        }
+        return false;
+    }
+
+    public void backtrack() {
+        backtrack(variables, 0);
+    }
+
+    public void backtrack(List<Integer> solution, int index) {
+        for (Integer value : this.domain.get(index)) {
+            solution.set(index, value);
+            if (isSolutionValid(new ArrayList<>(solution)) && isFinalSolution(solution)) {
+//                printSolution(solution);
+                System.out.println("Valid solution");
+            }
+            else if (isSolutionValid(new ArrayList<>(solution)) && index < solution.size() - 1) {
+                backtrack(new ArrayList<>(solution), index + 1);
+            }
+        }
     }
 }

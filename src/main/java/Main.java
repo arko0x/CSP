@@ -6,5 +6,6 @@ public class Main {
 
         Futoshiki futoshiki = new Futoshiki();
         futoshiki.readProblemFromFile("src/main/resources/data/futoshiki_4x4");
+        futoshiki.backtrack();
     }
 }
