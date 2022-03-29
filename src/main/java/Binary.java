@@ -5,9 +5,9 @@ import java.util.*;
 
 public class Binary {
     private List<Integer> variables;
-    private Map<Integer, List<Integer>> domain;
+    private final Map<Integer, List<Integer>> domain;
     private int n;
-    private List<Integer> unchangeableIndexes;
+    private final List<Integer> unchangeableIndexes;
 
     public Binary() {
         this.domain = new HashMap<>();
@@ -43,27 +43,22 @@ public class Binary {
         }
     }
 
-//    public boolean possibleToSetValueInIndex(int index, int value) {
-//        this.variables.set(index, value);
-//        int row = index / this.n;
-//        int column = index % this.n;
-//        if ((countValuesInRow(row, value) + countValuesInRow(row, Math.abs(value - 1)) == this.n
-//                && countValuesInRow(row, value) != countValuesInRow(row, Math.abs(value - 1))) ||
-//                (countValuesInColumn(column, value) + countValuesInColumn(column, Math.abs(value - 1)) == this.n
-//                && countValuesInColumn(column, value) != countValuesInColumn(column, Math.abs(value - 1))) ||
-//                countValuesInRow(row, value) > this.n / 2 ||
-//                countValuesInColumn(column, value) > this.n / 2 ||
-//                thereAreThreeValuesInARowInARow(row) ||
-//                thereAreThreeValuesInARowInAColumn(column) ||
-//                !isRowUnique(row) ||
-//                !isColumnUnique(column)) {
-//            this.variables.set(index, null);
-//            return false;
-//        }
-//
-//        this.variables.set(index, null);
-//        return true;
-//    }
+    public void backtrack() {
+        backtrack(variables, getFirstIndex());
+    }
+
+    public void backtrack(List<Integer> solution, int index) {
+        for (Integer value : this.domain.get(index)) {
+            solution.set(index, value);
+            if (isSolutionValid(new ArrayList<>(solution), index, value) && isFinalSolution(solution)) {
+                printSolution(solution);
+                System.out.println();
+            }
+            else if (isSolutionValid(new ArrayList<>(solution), index, value)) {
+                backtrack(new ArrayList<>(solution), getNextIndex(index, new ArrayList<>(solution)));
+            }
+        }
+    }
 
     private int getFirstIndex() {
         for (int i = 0; i < variables.size(); i++) {
@@ -175,23 +170,6 @@ public class Binary {
         return numberOfValues;
     }
 
-    public void backtrack() {
-        backtrack(variables, getFirstIndex());
-    }
-
-    public void backtrack(List<Integer> solution, int index) {
-        for (Integer value : this.domain.get(index)) {
-            solution.set(index, value);
-            if (isSolutionValid(new ArrayList<>(solution), index, value) && isFinalSolution(solution)) {
-                printSolution(solution);
-                System.out.println();
-            }
-            else if (isSolutionValid(new ArrayList<>(solution), index, value)) {
-                backtrack(new ArrayList<>(solution), getNextIndex(index, new ArrayList<>(solution)));
-            }
-        }
-    }
-
     private boolean isFinalSolution(List<Integer> solution) {
         return !solution.contains(null);
     }
@@ -199,20 +177,16 @@ public class Binary {
     private boolean isSolutionValid(List<Integer> solution, int index, int value) {
         int row = index / this.n;
         int column = index % this.n;
-        if ((countValuesInRow(row, value, solution) + countValuesInRow(row, Math.abs(value - 1), solution) == this.n
-                && countValuesInRow(row, value, solution) != countValuesInRow(row, Math.abs(value - 1), solution)) ||
-                (countValuesInColumn(column, value, solution) + countValuesInColumn(column, Math.abs(value - 1), solution) == this.n
-                && countValuesInColumn(column, value, solution) != countValuesInColumn(column, Math.abs(value - 1), solution)) ||
-                countValuesInRow(row, value, solution) > this.n / 2 ||
-                countValuesInColumn(column, value, solution) > this.n / 2 ||
-                thereAreThreeValuesInARowInARow(row, solution) ||
-                thereAreThreeValuesInARowInAColumn(column, solution) ||
-                !isRowUnique(row, solution) ||
-                !isColumnUnique(column, solution)) {
-            return false;
-        }
-
-        return true;
+        return (countValuesInRow(row, value, solution) + countValuesInRow(row, Math.abs(value - 1), solution) != this.n
+                || countValuesInRow(row, value, solution) == countValuesInRow(row, Math.abs(value - 1), solution)) &&
+                (countValuesInColumn(column, value, solution) + countValuesInColumn(column, Math.abs(value - 1), solution) != this.n
+                        || countValuesInColumn(column, value, solution) == countValuesInColumn(column, Math.abs(value - 1), solution)) &&
+                countValuesInRow(row, value, solution) <= this.n / 2 &&
+                countValuesInColumn(column, value, solution) <= this.n / 2 &&
+                !thereAreThreeValuesInARowInARow(row, solution) &&
+                !thereAreThreeValuesInARowInAColumn(column, solution) &&
+                isRowUnique(row, solution) &&
+                isColumnUnique(column, solution);
     }
 
     private void printSolution(List<Integer> solution) {
