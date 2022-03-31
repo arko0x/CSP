@@ -14,6 +14,7 @@ public class BinarySolution implements Solution {
     private int n;
     private List<Integer> unchangeableIndexes;
     private int numberOfSolutionsFound = 0;
+    public static int numberOfSolutions = 0;
 
     public BinarySolution() {
         this.domain = new HashMap<>();

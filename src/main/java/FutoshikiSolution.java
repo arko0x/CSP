@@ -14,6 +14,7 @@ public class FutoshikiSolution implements Solution {
     private Map<Integer, List<Integer>> domain;
     private Map<Pair<Integer, Integer>, Comparator<Integer>> constraints;
     private int n;
+    public static int numberOfSolutions = 0;
 
     public FutoshikiSolution() {
         this.domain = new HashMap<>();
@@ -173,9 +174,9 @@ public class FutoshikiSolution implements Solution {
     private boolean isRowValid(int rowNumber) {
         List<Integer> row = variables.subList(rowNumber * n, rowNumber * n + n);
         return row.stream().distinct().count() <= n
-                && row.stream().filter(Objects::nonNull).count() == row.stream().filter(Objects::nonNull).distinct().count()
-                && row.stream().filter(Objects::nonNull).max(Comparator.comparingInt(Integer::intValue)).orElse(1) <= n
-                && row.stream().filter(Objects::nonNull).min(Comparator.comparingInt(Integer::intValue)).orElse(n) >= 1;
+                && row.stream().filter(Objects::nonNull).count() == row.stream().filter(Objects::nonNull).distinct().count();
+//                && row.stream().filter(Objects::nonNull).max(Comparator.comparingInt(Integer::intValue)).orElse(1) <= n
+//                && row.stream().filter(Objects::nonNull).min(Comparator.comparingInt(Integer::intValue)).orElse(n) >= 1;
     }
 
     private boolean isColumnValid(int colNumber) {
@@ -184,17 +185,26 @@ public class FutoshikiSolution implements Solution {
             column.add(variables.get(i * n + colNumber));
         }
         return column.stream().distinct().count() <= n
-                && column.stream().filter(Objects::nonNull).count() == column.stream().filter(Objects::nonNull).distinct().count()
-                && column.stream().filter(Objects::nonNull).max(Comparator.comparingInt(Integer::intValue)).orElse(1) <= n
-                && column.stream().filter(Objects::nonNull).min(Comparator.comparingInt(Integer::intValue)).orElse(n) >= 1;
+                && column.stream().filter(Objects::nonNull).count() == column.stream().filter(Objects::nonNull).distinct().count();
+//                && column.stream().filter(Objects::nonNull).max(Comparator.comparingInt(Integer::intValue)).orElse(1) <= n
+//                && column.stream().filter(Objects::nonNull).min(Comparator.comparingInt(Integer::intValue)).orElse(n) >= 1;
     }
 
     private boolean checkConstraints() {
-        return constraints.keySet()
-                .stream()
-                .filter(indexPair -> variables.get(indexPair.getValue0()) != null && variables.get(indexPair.getValue1()) != null)
-                .filter(indexPair -> constraints.get(indexPair).compare(variables.get(indexPair.getValue0()), variables.get(indexPair.getValue1())) < 0)
-                .count() + constraints.keySet().stream().filter(indexPair -> variables.get(indexPair.getValue0()) == null || variables.get(indexPair.getValue1()) == null).count() == constraints.keySet().size();
+        int matched = 0;
+        int notFilled = 0;
+        for (Pair<Integer, Integer> pair : constraints.keySet()) {
+            if (variables.get(pair.getValue0()) == null || variables.get(pair.getValue1()) == null) notFilled++;
+            else if (constraints.get(pair).compare(variables.get(pair.getValue0()), variables.get(pair.getValue1())) < 0) {
+                matched++;
+            }
+        }
+        return matched + notFilled == constraints.size();
+//        return constraints.keySet()
+//                .stream()
+//                .filter(indexPair -> variables.get(indexPair.getValue0()) != null && variables.get(indexPair.getValue1()) != null)
+//                .filter(indexPair -> constraints.get(indexPair).compare(variables.get(indexPair.getValue0()), variables.get(indexPair.getValue1())) < 0)
+//                .count() + constraints.keySet().stream().filter(indexPair -> variables.get(indexPair.getValue0()) == null || variables.get(indexPair.getValue1()) == null).count() == constraints.keySet().size();
     }
 
     private boolean isComparatorReversed(Comparator<Integer> comparator) {

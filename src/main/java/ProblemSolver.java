@@ -1,6 +1,9 @@
 import javax.naming.OperationNotSupportedException;
 
 public class ProblemSolver {
+    public static int numberOfSolutionsBinary = 0;
+    public static int numberOfSolutionsFutoshiki = 0;
+
     public void backtrackBinary(Solution solution, int index) throws OperationNotSupportedException {
         for (Integer value : solution.getDomainForVariable(index)) {
             solution.set(index, value);
@@ -8,6 +11,7 @@ public class ProblemSolver {
             if (solutionValid && solution.isSolutionFinal()) {
                 solution.print();
                 System.out.println();
+                numberOfSolutionsBinary++;
             }
             else if (solutionValid) {
                 backtrackBinary(solution.getCopy(), solution.getNextIndex(index));
@@ -22,7 +26,7 @@ public class ProblemSolver {
             if (solutionValid && solution.isSolutionFinal()) {
                 solution.print();
                 System.out.println();
-//                validSolutions++;
+                numberOfSolutionsFutoshiki++;
             }
             else if (solutionValid && index < solution.size() - 1) {
                 backtrack(solution.getCopy(), solution.getNextIndex(index));
