@@ -3,12 +3,7 @@ import java.util.List;
 
 public interface Solution {
     void readProblemFromFile(String path);
-    default boolean isSolutionValid(int index) throws OperationNotSupportedException{
-        throw new OperationNotSupportedException();
-    }
-    default boolean isSolutionValid(int index, int value) throws OperationNotSupportedException {
-        throw new OperationNotSupportedException();
-    }
+    boolean isSolutionValid(int index, int value);
     boolean isSolutionFinal();
     List<Integer> getDomainForVariable(int index);
     void set(int index, int value);

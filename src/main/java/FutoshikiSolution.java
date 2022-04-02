@@ -72,7 +72,7 @@ public class FutoshikiSolution implements Solution {
     }
 
     @Override
-    public boolean isSolutionValid(int index) {
+    public boolean isSolutionValid(int index, int value) {
         return isRowValid(index / n) && isColumnValid(index % n) && checkConstraints();
     }
 
@@ -200,11 +200,6 @@ public class FutoshikiSolution implements Solution {
             }
         }
         return matched + notFilled == constraints.size();
-//        return constraints.keySet()
-//                .stream()
-//                .filter(indexPair -> variables.get(indexPair.getValue0()) != null && variables.get(indexPair.getValue1()) != null)
-//                .filter(indexPair -> constraints.get(indexPair).compare(variables.get(indexPair.getValue0()), variables.get(indexPair.getValue1())) < 0)
-//                .count() + constraints.keySet().stream().filter(indexPair -> variables.get(indexPair.getValue0()) == null || variables.get(indexPair.getValue1()) == null).count() == constraints.keySet().size();
     }
 
     private boolean isComparatorReversed(Comparator<Integer> comparator) {
