@@ -171,6 +171,21 @@ public class FutoshikiSolution implements Solution {
         return this.variables.size();
     }
 
+    @Override
+    public List<Integer> chooseValuesForIndex(int index) {
+        return null;
+    }
+
+    @Override
+    public void removeImpossibleDomains(int index, int value) {
+
+    }
+
+    @Override
+    public boolean hasEmptyDomain() {
+        return false;
+    }
+
     private boolean isRowValid(int rowNumber) {
         List<Integer> row = variables.subList(rowNumber * n, rowNumber * n + n);
         return row.stream().distinct().count() <= n

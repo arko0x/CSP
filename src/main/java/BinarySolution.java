@@ -1,10 +1,12 @@
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -43,7 +45,10 @@ public class BinarySolution implements Solution {
                     variables.set(i, Character.getNumericValue(c));
                     unchangeableIndexes.add(i);
                 }
-                domain.put(i, List.of(0, 1));
+                ArrayList<Integer> list = new ArrayList<>();
+                list.add(0);
+                list.add(1);
+                domain.put(i, list);
                 i++;
             }
         } catch (IOException e) {
@@ -86,7 +91,12 @@ public class BinarySolution implements Solution {
     public void print() {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                System.out.print(variables.get(i * n + j) + " ");
+                if (variables.get(i * n + j) == null) {
+                    System.out.print("x ");
+                }
+                else {
+                    System.out.print(variables.get(i * n + j) + " ");
+                }
             }
             System.out.println();
         }
@@ -97,7 +107,7 @@ public class BinarySolution implements Solution {
         BinarySolution binarySolution = new BinarySolution();
         binarySolution.variables = new ArrayList<>(variables);
         binarySolution.n = n;
-        binarySolution.domain = domain;
+        binarySolution.domain = domain.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new ArrayList<>(e.getValue())));
         binarySolution.unchangeableIndexes = unchangeableIndexes;
         return binarySolution;
     }
@@ -127,6 +137,81 @@ public class BinarySolution implements Solution {
         return this.variables.size();
     }
 
+    @Override
+    public List<Integer> chooseValuesForIndex(int index) {
+        return null;
+    }
+
+    @Override
+    public void printDomain() {
+        for (Integer val : domain.keySet()) {
+            System.out.print(domain.get(val) + " ");
+        }
+    }
+
+    @Override
+    public void removeImpossibleDomains(int index, int value) {
+        int row = index / this.n;
+        int column = index % this.n;
+
+        if (countValuesInRow(row, value) == this.n / 2) {
+            for (int i = n * row; i < n * row + n; i++) {
+                if (variables.get(i) == null) {
+                    List<Integer> newDomain = domain.get(i);
+                    newDomain.remove(Integer.valueOf(value));
+                }
+            }
+        }
+
+        if (countValuesInColumn(column, value) == this.n / 2) {
+            for (int i = column; i <= this.n; i += n) {
+                if (variables.get(i) == null) {
+                    List<Integer> newDomain = domain.get(i);
+                    newDomain.remove(Integer.valueOf(value));
+                }
+            }
+        }
+
+//        if (thereAreThreeValuesInARowInARow(row)) {
+//            int startIndex = getStartIndexOfThreeValuesInARowInARow(row);
+//            int endIndex = getEndIndexOfThreeValuesInARowInARow(row);
+//            if (startIndex % n - 1 > 0) {
+//                if (variables.get(startIndex - 1) == null) {
+//                    List<Integer> newDomain = domain.get(startIndex - 1);
+//                    newDomain.remove(Integer.valueOf(value));
+//                }
+//            }
+//            if (endIndex % n + 1 < n - 1) {
+//                if (variables.get(endIndex + 1) == null) {
+//                    List<Integer> newDomain = domain.get(endIndex + 1);
+//                    newDomain.remove(Integer.valueOf(value));
+//                }
+//            }
+//        }
+//
+//        if (thereAreThreeValuesInARowInAColumn(column)) {
+//            int startIndex = getStartIndexOfThreeValuesInARowInAColumn(column);
+//            int endIndex = getEndIndexOfThreeValuesInARowInAColumn(column);
+//            if (startIndex / n - 1 > 0) {
+//                if (variables.get(startIndex - n) == null) {
+//                    List<Integer> newDomain = domain.get(startIndex - n);
+//                    newDomain.remove(Integer.valueOf(value));
+//                }
+//            }
+//            if (endIndex / n + 1 < n - 1) {
+//                if (variables.get(endIndex + 1) == null) {
+//                    List<Integer> newDomain = domain.get(endIndex + 1);
+//                    newDomain.remove(Integer.valueOf(value));
+//                }
+//            }
+//        }
+    }
+
+    @Override
+    public boolean hasEmptyDomain() {
+        return this.domain.containsValue(new ArrayList<Integer>());
+    }
+
     private boolean thereAreThreeValuesInARowInARow(int row) {
         int startIndex = this.n * row;
         int endIndex = this.n * row + n - 1;
@@ -139,6 +224,30 @@ public class BinarySolution implements Solution {
         return false;
     }
 
+    private int getStartIndexOfThreeValuesInARowInARow(int row) {
+        int startIndex = this.n * row;
+        int endIndex = this.n * row + n - 1;
+
+        for (int i = startIndex + 2; i <= endIndex; i++) {
+            if (Objects.nonNull(variables.get(i - 2)) && Objects.equals(variables.get(i - 2), variables.get(i - 1)) && Objects.equals(variables.get(i - 1), variables.get(i))) {
+                return i - 2;
+            }
+        }
+        return -1;
+    }
+
+    private int getEndIndexOfThreeValuesInARowInARow(int row) {
+        int startIndex = this.n * row;
+        int endIndex = this.n * row + n - 1;
+
+        for (int i = startIndex + 2; i <= endIndex; i++) {
+            if (Objects.nonNull(variables.get(i - 2)) && Objects.equals(variables.get(i - 2), variables.get(i - 1)) && Objects.equals(variables.get(i - 1), variables.get(i))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private boolean thereAreThreeValuesInARowInAColumn(int column) {
         int startIndex = column;
         int endIndex = this.n * (this.n - 1) + column;
@@ -149,6 +258,30 @@ public class BinarySolution implements Solution {
             }
         }
         return false;
+    }
+
+    private int getStartIndexOfThreeValuesInARowInAColumn(int column) {
+        int startIndex = column;
+        int endIndex = this.n * (this.n - 1) + column;
+
+        for (int i = startIndex + n * 2; i <= endIndex; i += n) {
+            if (Objects.nonNull(variables.get(i - n * 2)) && Objects.equals(variables.get(i - n * 2), variables.get(i - n)) && Objects.equals(variables.get(i - n), variables.get(i))) {
+                return i - n * 2;
+            }
+        }
+        return -1;
+    }
+
+    private int getEndIndexOfThreeValuesInARowInAColumn(int column) {
+        int startIndex = column;
+        int endIndex = this.n * (this.n - 1) + column;
+
+        for (int i = startIndex + n * 2; i <= endIndex; i += n) {
+            if (Objects.nonNull(variables.get(i - n * 2)) && Objects.equals(variables.get(i - n * 2), variables.get(i - n)) && Objects.equals(variables.get(i - n), variables.get(i))) {
+                return i - n;
+            }
+        }
+        return -1;
     }
 
     private boolean isRowUnique(int row) {

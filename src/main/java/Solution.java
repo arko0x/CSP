@@ -12,4 +12,8 @@ public interface Solution {
     int getNextIndex(int index);
     int getFirstIndex();
     int size();
+    List<Integer> chooseValuesForIndex(int index);
+    void removeImpossibleDomains(int index, int value);
+    boolean hasEmptyDomain();
+    default void printDomain() {}
 }
