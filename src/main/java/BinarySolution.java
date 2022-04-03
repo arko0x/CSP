@@ -154,23 +154,51 @@ public class BinarySolution implements Solution {
         int row = index / this.n;
         int column = index % this.n;
 
-        if (countValuesInRow(row, value) == this.n / 2) {
-            for (int i = n * row; i < n * row + n; i++) {
-                if (variables.get(i) == null) {
-                    List<Integer> newDomain = domain.get(i);
-                    newDomain.remove(Integer.valueOf(value));
+        for (int i = n * row; i < n * row + n; i++) {
+            if (variables.get(i) == null) {
+                List<Integer> localDomain = domain.get(i);
+                for (int j = 0; j < localDomain.size(); j++) {
+                    set(i, localDomain.get(j));
+                    if (!isSolutionValid(i, localDomain.get(j))) {
+                        List<Integer> newDomain = domain.get(i);
+                        newDomain.remove(Integer.valueOf(localDomain.get(j)));
+                    }
+                    variables.set(i, null);
                 }
             }
         }
 
-        if (countValuesInColumn(column, value) == this.n / 2) {
-            for (int i = column; i <= this.n; i += n) {
-                if (variables.get(i) == null) {
-                    List<Integer> newDomain = domain.get(i);
-                    newDomain.remove(Integer.valueOf(value));
+        for (int i = column; i <= this.n; i += n) {
+            if (variables.get(i) == null) {
+                List<Integer> localDomain = domain.get(i);
+                for (int j = 0; j < localDomain.size(); j++) {
+                    set(i, localDomain.get(j));
+                    if (!isSolutionValid(i, localDomain.get(j))) {
+                        List<Integer> newDomain = domain.get(i);
+                        newDomain.remove(Integer.valueOf(localDomain.get(j)));
+                    }
+                    variables.set(i, null);
                 }
             }
         }
+
+//        if (countValuesInRow(row, value) == this.n / 2) {
+//            for (int i = n * row; i < n * row + n; i++) {
+//                if (variables.get(i) == null) {
+//                    List<Integer> newDomain = domain.get(i);
+//                    newDomain.remove(Integer.valueOf(value));
+//                }
+//            }
+//        }
+//
+//        if (countValuesInColumn(column, value) == this.n / 2) {
+//            for (int i = column; i <= this.n; i += n) {
+//                if (variables.get(i) == null) {
+//                    List<Integer> newDomain = domain.get(i);
+//                    newDomain.remove(Integer.valueOf(value));
+//                }
+//            }
+//        }
 
 //        if (thereAreThreeValuesInARowInARow(row)) {
 //            int startIndex = getStartIndexOfThreeValuesInARowInARow(row);
