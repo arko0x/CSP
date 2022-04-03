@@ -4,19 +4,21 @@ public class Main {
     public static void main(String[] args) throws OperationNotSupportedException {
         ProblemSolver problemSolver = new ProblemSolver();
         BinarySolution binarySolution = new BinarySolution();
-        binarySolution.readProblemFromFile("src/main/resources/data/binary_6x6");
+        NextVariableStrategy nextVariableStrategy = new LeastDomainSizeStrategy(binarySolution);
+        binarySolution.setNextVariableStrategy(nextVariableStrategy);
+        binarySolution.readProblemFromFile("src/main/resources/data/binary_10x10");
         long startTime = System.currentTimeMillis();
         problemSolver.forwardChecking(binarySolution, binarySolution.getFirstIndex());
         System.out.println(ProblemSolver.forwardCheckingNodesVisits);
         System.out.println(System.currentTimeMillis() - startTime);
 
-        ProblemSolver problemSolver1 = new ProblemSolver();
-        BinarySolution binarySolution1 = new BinarySolution();
-        binarySolution1.readProblemFromFile("src/main/resources/data/binary_6x6");
-        startTime = System.currentTimeMillis();
-        problemSolver1.backtrack(binarySolution1, binarySolution1.getFirstIndex());
-        System.out.println(ProblemSolver.backtrackNodesVisits);
-        System.out.println(System.currentTimeMillis() - startTime);
+//        ProblemSolver problemSolver1 = new ProblemSolver();
+//        BinarySolution binarySolution1 = new BinarySolution();
+//        binarySolution1.readProblemFromFile("src/main/resources/data/binary_6x6");
+//        startTime = System.currentTimeMillis();
+//        problemSolver1.backtrack(binarySolution1, binarySolution1.getFirstIndex());
+//        System.out.println(ProblemSolver.backtrackNodesVisits);
+//        System.out.println(System.currentTimeMillis() - startTime);
 
 //        long startTime = System.currentTimeMillis();
 //        FutoshikiSolution futoshikiSolution = new FutoshikiSolution();

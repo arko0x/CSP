@@ -1,6 +1,5 @@
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,6 +15,7 @@ public class BinarySolution implements Solution {
     private int n;
     private List<Integer> unchangeableIndexes;
     private int numberOfSolutionsFound = 0;
+    private NextVariableStrategy nextVariableStrategy;
     public static int numberOfSolutions = 0;
 
     public BinarySolution() {
@@ -109,17 +109,20 @@ public class BinarySolution implements Solution {
         binarySolution.n = n;
         binarySolution.domain = domain.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new ArrayList<>(e.getValue())));
         binarySolution.unchangeableIndexes = unchangeableIndexes;
+        binarySolution.nextVariableStrategy = nextVariableStrategy;
+        binarySolution.nextVariableStrategy.setSolution(binarySolution);
         return binarySolution;
     }
 
     @Override
     public int getNextIndex(int index) {
-        for (int i = 0; i < variables.size(); i++) {
-            if (i > index && !unchangeableIndexes.contains(i)) {
-                return i;
-            }
-        }
-        return -1;
+        return nextVariableStrategy.getNextIndex(index);
+//        for (int i = 0; i < variables.size(); i++) {
+//            if (i > index && !unchangeableIndexes.contains(i)) {
+//                return i;
+//            }
+//        }
+//        return -1;
     }
 
     @Override
@@ -148,6 +151,8 @@ public class BinarySolution implements Solution {
             System.out.print(domain.get(val) + " ");
         }
     }
+
+
 
     @Override
     public void removeImpossibleDomains(int index, int value) {
