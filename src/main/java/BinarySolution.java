@@ -16,6 +16,7 @@ public class BinarySolution implements Solution {
     private List<Integer> unchangeableIndexes;
     private int numberOfSolutionsFound = 0;
     private NextVariableStrategy nextVariableStrategy;
+    private DomainOrderingStrategy domainOrderingStrategy;
     public static int numberOfSolutions = 0;
 
     public BinarySolution() {
@@ -79,7 +80,9 @@ public class BinarySolution implements Solution {
 
     @Override
     public List<Integer> getDomainForVariable(int index) {
+        domainOrderingStrategy.sortDomainForVariable(index, this);
         return domain.get(index);
+//        return domain.get(index);
     }
 
     @Override
@@ -111,6 +114,7 @@ public class BinarySolution implements Solution {
         binarySolution.unchangeableIndexes = unchangeableIndexes;
         binarySolution.nextVariableStrategy = nextVariableStrategy;
         binarySolution.nextVariableStrategy.setSolution(binarySolution);
+        binarySolution.domainOrderingStrategy = domainOrderingStrategy;
         return binarySolution;
     }
 
@@ -151,8 +155,6 @@ public class BinarySolution implements Solution {
             System.out.print(domain.get(val) + " ");
         }
     }
-
-
 
     @Override
     public void removeImpossibleDomains(int index, int value) {
@@ -238,6 +240,34 @@ public class BinarySolution implements Solution {
 //                }
 //            }
 //        }
+    }
+
+    public int countDomainRemovals(int index, int value) {
+        int row = index / this.n;
+        int column = index % this.n;
+        int howManyRemovals = 0;
+
+        for (int i = n * row; i < n * row + n; i++) {
+            if (variables.get(i) == null) {
+                set(i, value);
+                if (!isSolutionValid(i, value)) {
+                    howManyRemovals++;
+                }
+                variables.set(i, null);
+            }
+        }
+
+        for (int i = column; i <= this.n; i += n) {
+            if (variables.get(i) == null) {
+                set(i, value);
+                if (!isSolutionValid(i, value)) {
+                    howManyRemovals++;
+                }
+                variables.set(i, null);
+            }
+        }
+
+        return howManyRemovals;
     }
 
     @Override

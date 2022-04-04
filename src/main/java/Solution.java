@@ -17,6 +17,7 @@ public interface Solution {
     int size();
     List<Integer> chooseValuesForIndex(int index);
     void removeImpossibleDomains(int index, int value);
+    int countDomainRemovals(int index, int value);
     boolean hasEmptyDomain();
     default void printDomain() {}
 }

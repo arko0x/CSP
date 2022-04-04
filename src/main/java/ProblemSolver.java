@@ -1,53 +1,47 @@
-import javax.naming.OperationNotSupportedException;
 
 public class ProblemSolver {
-    public static int backtrackNodesVisits = 0;
-    public static int forwardCheckingNodesVisits = 0;
-    public static int numberOfSolutionsBinary = 0;
-    public static int numberOfSolutionsFutoshiki = 0;
+    public static int nodesVisited = 0;
+    public static int numberOfSolutions = 0;
+    public static int goingBacks = 0;
 
     public void backtrack(Solution solution, int index) {
         for (Integer value : solution.getDomainForVariable(index)) {
             solution.set(index, value);
-            backtrackNodesVisits++;
+            nodesVisited++;
             boolean solutionValid = solution.isSolutionValid(index, value);
             if (solutionValid && solution.isSolutionFinal()) {
                 solution.print();
-                System.out.println("___________________________________");
+                numberOfSolutions++;
             }
             else if (solutionValid) {
                 backtrack(solution.getCopy(), solution.getNextIndex(index));
+            }
+            else {
+                goingBacks++;
             }
         }
     }
 
     public void forwardChecking(Solution solution, int index) {
         for (Integer value : solution.getDomainForVariable(index)) {
-            Solution prevSolution = solution.getCopy();
             solution.set(index, value);
-            forwardCheckingNodesVisits++;
+            nodesVisited++;
             boolean solutionValid = solution.isSolutionValid(index, value);
 
-//            solution.print();
-//            System.out.println("Valid: " + solutionValid);
-//            System.out.println("Index: " + index);
-//            System.out.println("Has empty domain: " + solution.hasEmptyDomain());
-//            solution.printDomain();
-//            System.out.println();
-//            System.out.println();
-            if (solution.hasEmptyDomain()) {
-                solution = prevSolution;
-            }
-            else if (solutionValid && solution.isSolutionFinal()) {
+            if (solutionValid && solution.isSolutionFinal()) {
                 solution.print();
+                numberOfSolutions++;
             }
             else if (solutionValid) {
+                Solution prevSolution = solution.getCopy();
                 solution.removeImpossibleDomains(index, value);
-                forwardChecking(solution.getCopy(), solution.getNextIndex(index));
-//                System.out.println("Returned from recursion");
+                if (!solution.hasEmptyDomain()) {
+                    forwardChecking(solution, solution.getNextIndex(index));
+                }
                 solution = prevSolution;
-            } else {
-                solution = prevSolution;
+            }
+            else {
+                goingBacks++;
             }
         }
     }

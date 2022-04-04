@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -42,7 +44,9 @@ public class FutoshikiSolution implements Solution {
                         domainValuesList.add(j + 1);
                     }
                 }
-                domain.put(i, domainValuesList);
+                if (variables.get(i) == null) {
+                    domain.put(i, domainValuesList);
+                }
             }
 
             for (int i = 0; i < n; i++) {
@@ -69,6 +73,16 @@ public class FutoshikiSolution implements Solution {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public int countDomainRemovals(int index, int value) {
+        return 0;
+    }
+
+    @Override
+    public void printDomain() {
+        Solution.super.printDomain();
     }
 
     @Override
@@ -128,19 +142,13 @@ public class FutoshikiSolution implements Solution {
             }
             System.out.println();
         }
-//        for (int i = 0; i < n; i++) {
-//            for (int j = 0; j < n; j++) {
-//                System.out.print(variables.get(i * n + j) + " ");
-//            }
-//            System.out.println();
-//        }
     }
 
     @Override
     public Solution getCopy() {
         FutoshikiSolution solution = new FutoshikiSolution();
         solution.setConstraints(constraints);
-        solution.setDomain(domain);
+        solution.domain = domain.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new ArrayList<>(e.getValue())));
         solution.setN(n);
         solution.setVariables(new ArrayList<>(variables));
         return solution;
@@ -178,20 +186,48 @@ public class FutoshikiSolution implements Solution {
 
     @Override
     public void removeImpossibleDomains(int index, int value) {
+        int row = index / this.n;
+        int column = index % this.n;
 
+        for (int i = n * row; i < n * row + n; i++) {
+            if (variables.get(i) == null) {
+                List<Integer> localDomain = domain.get(i);
+                for (int j = 0; j < localDomain.size(); j++) {
+                    set(i, localDomain.get(j));
+                    if (!isSolutionValid(i, localDomain.get(j))) {
+                        List<Integer> newDomain = domain.get(i);
+                        newDomain.remove(Integer.valueOf(localDomain.get(j)));
+                    }
+                    variables.set(i, null);
+                }
+            }
+        }
+
+        for (int i = column; i <= this.n; i += n) {
+            if (variables.get(i) == null) {
+                List<Integer> localDomain = domain.get(i);
+                for (int j = 0; j < localDomain.size(); j++) {
+                    set(i, localDomain.get(j));
+                    if (!isSolutionValid(i, localDomain.get(j))) {
+                        List<Integer> newDomain = domain.get(i);
+                        newDomain.remove(Integer.valueOf(localDomain.get(j)));
+                    }
+                    variables.set(i, null);
+                }
+            }
+        }
     }
 
     @Override
     public boolean hasEmptyDomain() {
-        return false;
+        return this.domain.values().stream().anyMatch(list -> list.size() == 0);
     }
 
     private boolean isRowValid(int rowNumber) {
         List<Integer> row = variables.subList(rowNumber * n, rowNumber * n + n);
-        return row.stream().distinct().count() <= n
-                && row.stream().filter(Objects::nonNull).count() == row.stream().filter(Objects::nonNull).distinct().count();
-//                && row.stream().filter(Objects::nonNull).max(Comparator.comparingInt(Integer::intValue)).orElse(1) <= n
-//                && row.stream().filter(Objects::nonNull).min(Comparator.comparingInt(Integer::intValue)).orElse(n) >= 1;
+        Stream<Integer> selectedRow = row.stream().filter(Objects::nonNull);
+        Stream<Integer> selectedRowDistinct = row.stream().filter(Objects::nonNull).distinct();
+        return selectedRow.count() == selectedRowDistinct.count();
     }
 
     private boolean isColumnValid(int colNumber) {
@@ -199,10 +235,9 @@ public class FutoshikiSolution implements Solution {
         for (int i = 0; i < n; i++) {
             column.add(variables.get(i * n + colNumber));
         }
-        return column.stream().distinct().count() <= n
-                && column.stream().filter(Objects::nonNull).count() == column.stream().filter(Objects::nonNull).distinct().count();
-//                && column.stream().filter(Objects::nonNull).max(Comparator.comparingInt(Integer::intValue)).orElse(1) <= n
-//                && column.stream().filter(Objects::nonNull).min(Comparator.comparingInt(Integer::intValue)).orElse(n) >= 1;
+        Stream<Integer> col = column.stream().filter(Objects::nonNull);
+        Stream<Integer> colDistinct = column.stream().filter(Objects::nonNull).distinct();
+        return col.count() == colDistinct.count();
     }
 
     private boolean checkConstraints() {
