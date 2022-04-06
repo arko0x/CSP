@@ -82,7 +82,6 @@ public class BinarySolution implements Solution {
     public List<Integer> getDomainForVariable(int index) {
         domainOrderingStrategy.sortDomainForVariable(index, this);
         return domain.get(index);
-//        return domain.get(index);
     }
 
     @Override
@@ -121,12 +120,6 @@ public class BinarySolution implements Solution {
     @Override
     public int getNextIndex(int index) {
         return nextVariableStrategy.getNextIndex(index);
-//        for (int i = 0; i < variables.size(); i++) {
-//            if (i > index && !unchangeableIndexes.contains(i)) {
-//                return i;
-//            }
-//        }
-//        return -1;
     }
 
     @Override
@@ -188,58 +181,6 @@ public class BinarySolution implements Solution {
                 }
             }
         }
-
-//        if (countValuesInRow(row, value) == this.n / 2) {
-//            for (int i = n * row; i < n * row + n; i++) {
-//                if (variables.get(i) == null) {
-//                    List<Integer> newDomain = domain.get(i);
-//                    newDomain.remove(Integer.valueOf(value));
-//                }
-//            }
-//        }
-//
-//        if (countValuesInColumn(column, value) == this.n / 2) {
-//            for (int i = column; i <= this.n; i += n) {
-//                if (variables.get(i) == null) {
-//                    List<Integer> newDomain = domain.get(i);
-//                    newDomain.remove(Integer.valueOf(value));
-//                }
-//            }
-//        }
-
-//        if (thereAreThreeValuesInARowInARow(row)) {
-//            int startIndex = getStartIndexOfThreeValuesInARowInARow(row);
-//            int endIndex = getEndIndexOfThreeValuesInARowInARow(row);
-//            if (startIndex % n - 1 > 0) {
-//                if (variables.get(startIndex - 1) == null) {
-//                    List<Integer> newDomain = domain.get(startIndex - 1);
-//                    newDomain.remove(Integer.valueOf(value));
-//                }
-//            }
-//            if (endIndex % n + 1 < n - 1) {
-//                if (variables.get(endIndex + 1) == null) {
-//                    List<Integer> newDomain = domain.get(endIndex + 1);
-//                    newDomain.remove(Integer.valueOf(value));
-//                }
-//            }
-//        }
-//
-//        if (thereAreThreeValuesInARowInAColumn(column)) {
-//            int startIndex = getStartIndexOfThreeValuesInARowInAColumn(column);
-//            int endIndex = getEndIndexOfThreeValuesInARowInAColumn(column);
-//            if (startIndex / n - 1 > 0) {
-//                if (variables.get(startIndex - n) == null) {
-//                    List<Integer> newDomain = domain.get(startIndex - n);
-//                    newDomain.remove(Integer.valueOf(value));
-//                }
-//            }
-//            if (endIndex / n + 1 < n - 1) {
-//                if (variables.get(endIndex + 1) == null) {
-//                    List<Integer> newDomain = domain.get(endIndex + 1);
-//                    newDomain.remove(Integer.valueOf(value));
-//                }
-//            }
-//        }
     }
 
     public int countDomainRemovals(int index, int value) {

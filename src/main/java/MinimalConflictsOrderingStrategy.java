@@ -13,6 +13,6 @@ public class MinimalConflictsOrderingStrategy implements DomainOrderingStrategy 
 
     @Override
     public void sortDomainForVariable(int index, Solution solution) {
-        solution.getDomain().get(index).sort(Comparator.comparingInt(e -> solution.countDomainRemovals(index, e)));
+        solution.getDomain().get(index).sort(Comparator.comparingInt(e -> 100 - solution.countDomainRemovals(index, e)));
     }
 }
