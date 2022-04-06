@@ -1,4 +1,8 @@
+package nextvariablestrategy;
+
 import lombok.Setter;
+import nextvariablestrategy.NextVariableStrategy;
+import solutions.Solution;
 
 import java.util.List;
 

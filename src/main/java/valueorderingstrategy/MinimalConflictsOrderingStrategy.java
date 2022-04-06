@@ -1,3 +1,8 @@
+package valueorderingstrategy;
+
+import solutions.Solution;
+import valueorderingstrategy.DomainOrderingStrategy;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +18,6 @@ public class MinimalConflictsOrderingStrategy implements DomainOrderingStrategy 
 
     @Override
     public void sortDomainForVariable(int index, Solution solution) {
-        solution.getDomain().get(index).sort(Comparator.comparingInt(e -> 100 - solution.countDomainRemovals(index, e)));
+        solution.getDomain().get(index).sort(Comparator.comparingInt(value -> solution.countDomainRemovals(index, value)));
     }
 }

@@ -1,4 +1,5 @@
-import javax.naming.OperationNotSupportedException;
+package solutions;
+
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,7 @@ public interface Solution {
     List<Integer> chooseValuesForIndex(int index);
     void removeImpossibleDomains(int index, int value);
     int countDomainRemovals(int index, int value);
+    int countConstraintsBrokenAfterSettingDomainValues(int index);
     boolean hasEmptyDomain();
     default void printDomain() {}
 }

@@ -1,6 +1,10 @@
+package solutions;
+
 import lombok.Getter;
 import lombok.Setter;
+import nextvariablestrategy.NextVariableStrategy;
 import org.javatuples.Pair;
+import valueorderingstrategy.DomainOrderingStrategy;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -83,26 +87,32 @@ public class FutoshikiSolution implements Solution {
         int column = index % this.n;
         int howManyRemovals = 0;
 
+        set(index, value);
         for (int i = n * row; i < n * row + n; i++) {
-            if (variables.get(i) == null) {
-                set(i, value);
-                if (!isSolutionValid(i, value)) {
-                    howManyRemovals++;
+            if (variables.get(i) == null && i != index) {
+                for (Integer domValue : domain.get(i)) {
+                    set(i, domValue);
+                    if (!isSolutionValid(i, domValue)) {
+                        howManyRemovals++;
+                    }
+                    variables.set(i, null);
                 }
-                variables.set(i, null);
             }
         }
 
         for (int i = column; i <= this.n; i += n) {
-            if (variables.get(i) == null) {
-                set(i, value);
-                if (!isSolutionValid(i, value)) {
-                    howManyRemovals++;
+            if (variables.get(i) == null && i != index) {
+                for (Integer domValue : domain.get(i)) {
+                    set(i, domValue);
+                    if (!isSolutionValid(i, domValue)) {
+                        howManyRemovals++;
+                    }
+                    variables.set(i, null);
                 }
-                variables.set(i, null);
             }
         }
 
+        this.variables.set(index, null);
         return howManyRemovals;
     }
 
@@ -250,6 +260,20 @@ public class FutoshikiSolution implements Solution {
         return this.domain.values().stream().anyMatch(list -> list.size() == 0);
     }
 
+    @Override
+    public int countConstraintsBrokenAfterSettingDomainValues(int index) {
+        List<Integer> localDomain = domain.get(index);
+        int constraintsBroken = 0;
+        for (int i = 0; i < localDomain.size(); i++) {
+            set(index, localDomain.get(i));
+            if (!isSolutionValid(index, localDomain.get(i))) {
+                constraintsBroken++;
+            }
+            variables.set(index, null);
+        }
+        return constraintsBroken;
+    }
+
     private boolean isRowValid(int rowNumber) {
         List<Integer> row = variables.subList(rowNumber * n, rowNumber * n + n);
         Stream<Integer> selectedRow = row.stream().filter(Objects::nonNull);
@@ -277,6 +301,17 @@ public class FutoshikiSolution implements Solution {
             }
         }
         return matched + notFilled == constraints.size();
+    }
+
+    private boolean checkConstraintsForIndex(int index) {
+        List<Pair<Integer, Integer>> localConstraints = constraints.keySet().stream().filter(pair -> pair.getValue0() == index || pair.getValue1() == index).toList();
+        for (Pair<Integer, Integer> pair : localConstraints) {
+            if (variables.get(pair.getValue0()) != null && variables.get(pair.getValue1()) != null &&
+            constraints.get(pair).compare(variables.get(pair.getValue0()), variables.get(pair.getValue1())) > 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean isComparatorReversed(Comparator<Integer> comparator) {

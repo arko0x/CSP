@@ -1,5 +1,9 @@
+package solutions;
+
 import lombok.Getter;
 import lombok.Setter;
+import nextvariablestrategy.NextVariableStrategy;
+import valueorderingstrategy.DomainOrderingStrategy;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -214,6 +218,11 @@ public class BinarySolution implements Solution {
     @Override
     public boolean hasEmptyDomain() {
         return this.domain.containsValue(new ArrayList<Integer>());
+    }
+
+    @Override
+    public int countConstraintsBrokenAfterSettingDomainValues(int index) {
+        return 0;
     }
 
     private boolean thereAreThreeValuesInARowInARow(int row) {
