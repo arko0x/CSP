@@ -10,7 +10,6 @@ import valueorderingstrategy.MinimalConflictsOrderingStrategy;
 public class Main {
     public static void main(String[] args) {
         long startTime = 0;
-
 //        System.out.println("6x6 backtracking");
 //        ProblemSolver problemSolver = new ProblemSolver();
 //        BinarySolution binarySolution6x6Backtrack = new BinarySolution();
@@ -194,6 +193,7 @@ public class Main {
 //        System.out.println("______________________________________________________");
 //        ProblemSolver.nodesVisited = ProblemSolver.goingBacks = ProblemSolver.numberOfSolutions = 0;
 
+
         System.out.println("6x6 binary backtracking until first solution");
         ProblemSolver problemSolver = new ProblemSolver();
         BinarySolution binarySolution6x6Backtrack = new BinarySolution();
@@ -373,9 +373,9 @@ public class Main {
 
         System.out.println("6x6 futoshiki forward search until first solution");
         FutoshikiSolution futoshikiSolution6x6ForwardChecking = new FutoshikiSolution();
-        nextVariableStrategy = new DefaultNextVariableStrategy(futoshikiSolution6x6ForwardChecking);
+        nextVariableStrategy = new LeastDomainSizeStrategy(futoshikiSolution6x6ForwardChecking);
         futoshikiSolution6x6ForwardChecking.setNextVariableStrategy(nextVariableStrategy);
-        domainOrderingStrategy = new MinimalConflictsOrderingStrategy();
+        domainOrderingStrategy = new DefaultOrderingStrategy();
         futoshikiSolution6x6ForwardChecking.setDomainOrderingStrategy(domainOrderingStrategy);
         futoshikiSolution6x6ForwardChecking.readProblemFromFile("src/main/resources/data/futoshiki_6x6");
         startTime = System.currentTimeMillis();

@@ -49,23 +49,41 @@ public class ProblemSolver {
         return false;
     }
 
+    public void initialDomainRemoval(Solution solution) {
+        List<Integer> solutionVariables = solution.getVariables();
+        for (int i = 0; i < solutionVariables.size(); i++) {
+            List<Integer> variableDomain = solution.getDomainForVariable(i);
+            if (solutionVariables.get(i) == null) {
+                for (int j = 0; j < variableDomain.size(); j++) {
+                    solution.set(i, variableDomain.get(j));
+                    if (!solution.isSolutionValid(i, variableDomain.get(j))) {
+                        variableDomain.remove(Integer.valueOf(variableDomain.get(j)));
+                    }
+                    solutionVariables.set(i, null);
+                }
+            }
+        }
+    }
+
     public void forwardChecking(Solution solution, int index) {
         for (Integer value : solution.getDomainForVariable(index)) {
             solution.set(index, value);
             nodesVisited++;
             boolean solutionValid = solution.isSolutionValid(index, value);
 
-            if (solutionValid && solution.isSolutionFinal()) {
-//                solution.print();
-                numberOfSolutions++;
-            }
-            else if (solutionValid) {
-                Solution prevSolution = solution.getCopy();
-                solution.removeImpossibleDomains(index, value);
-                if (!solution.hasEmptyDomain()) {
-                    forwardChecking(solution, solution.getNextIndex(index));
+            if (solutionValid) {
+                if (solution.isSolutionFinal()) {
+                    //solution.print();
+                    numberOfSolutions++;
                 }
-                solution = prevSolution;
+                else {
+                    Solution prevSolution = solution.getCopy();
+                    solution.removeImpossibleDomains(index, value);
+                    if (!solution.hasEmptyDomain()) {
+                        forwardChecking(solution, solution.getNextIndex(index));
+                    }
+                    solution = prevSolution;
+                }
             }
             else {
                 goingBacks++;
@@ -82,18 +100,20 @@ public class ProblemSolver {
             nodesVisited++;
             boolean solutionValid = solution.isSolutionValid(index, domain.get(i));
 
-            if (solutionValid && solution.isSolutionFinal()) {
-//                solution.print();
-                numberOfSolutions++;
-                return true;
-            }
-            else if (solutionValid) {
-                Solution prevSolution = solution.getCopy();
-                solution.removeImpossibleDomains(index, domain.get(i));
-                if (!solution.hasEmptyDomain()) {
-                    solutionFound = forwardCheckingUntilFirstSolution(solution, solution.getNextIndex(index));
+            if (solutionValid) {
+                if (solution.isSolutionFinal()) {
+                    //                solution.print();
+                    numberOfSolutions++;
+                    return true;
                 }
-                solution = prevSolution;
+                else {
+                    Solution prevSolution = solution.getCopy();
+                    solution.removeImpossibleDomains(index, domain.get(i));
+                    if (!solution.hasEmptyDomain()) {
+                        solutionFound = forwardCheckingUntilFirstSolution(solution, solution.getNextIndex(index));
+                    }
+                    solution = prevSolution;
+                }
             }
             else {
                 goingBacks++;
