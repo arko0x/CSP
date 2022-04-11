@@ -1,5 +1,8 @@
 package solutions;
 
+import nextvariablestrategy.NextVariableStrategy;
+import valueorderingstrategy.DomainOrderingStrategy;
+
 import java.util.List;
 import java.util.Map;
 
@@ -21,5 +24,7 @@ public interface Solution {
     int countDomainRemovals(int index, int value);
     int countConstraintsBrokenAfterSettingDomainValues(int index);
     boolean hasEmptyDomain();
+    void setNextVariableStrategy(NextVariableStrategy strategy);
+    void setDomainOrderingStrategy(DomainOrderingStrategy strategy);
     default void printDomain() {}
 }

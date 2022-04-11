@@ -172,7 +172,7 @@ public class BinarySolution implements Solution {
             }
         }
 
-        for (int i = column; i <= this.n; i += n) {
+        for (int i = column; i < this.n * n; i += n) {
             if (variables.get(i) == null) {
                 List<Integer> localDomain = domain.get(i);
                 for (int j = 0; j < localDomain.size(); j++) {
@@ -193,7 +193,7 @@ public class BinarySolution implements Solution {
         int howManyRemovals = 0;
 
         for (int i = n * row; i < n * row + n; i++) {
-            if (variables.get(i) == null) {
+            if (variables.get(i) == null && index != i) {
                 set(i, value);
                 if (!isSolutionValid(i, value)) {
                     howManyRemovals++;
@@ -202,8 +202,8 @@ public class BinarySolution implements Solution {
             }
         }
 
-        for (int i = column; i <= this.n; i += n) {
-            if (variables.get(i) == null) {
+        for (int i = column; i < this.n * n; i += n) {
+            if (variables.get(i) == null && index != i) {
                 set(i, value);
                 if (!isSolutionValid(i, value)) {
                     howManyRemovals++;
@@ -306,6 +306,7 @@ public class BinarySolution implements Solution {
             sb.append(variables.get(i));
         }
         String rowString = sb.toString();
+        if (rowString.contains("null")) return true;
 
         for (int i = 0; i <= n * n - n; i += n) {
             if (i != startIndex) {
@@ -330,6 +331,7 @@ public class BinarySolution implements Solution {
             sb.append(variables.get(i));
         }
         String columnString = sb.toString();
+        if (columnString.contains("null")) return true;
 
         for (int i = 0; i < n; i++) {
             if (i != column) {

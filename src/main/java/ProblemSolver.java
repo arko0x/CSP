@@ -55,6 +55,9 @@ public class ProblemSolver {
             List<Integer> variableDomain = solution.getDomainForVariable(i);
             if (solutionVariables.get(i) == null) {
                 for (int j = 0; j < variableDomain.size(); j++) {
+                    if (i == 27 && j == 1) {
+                        System.out.println();
+                    }
                     solution.set(i, variableDomain.get(j));
                     if (!solution.isSolutionValid(i, variableDomain.get(j))) {
                         variableDomain.remove(Integer.valueOf(variableDomain.get(j)));
@@ -81,12 +84,40 @@ public class ProblemSolver {
                     solution.removeImpossibleDomains(index, value);
                     if (!solution.hasEmptyDomain()) {
                         forwardChecking(solution, solution.getNextIndex(index));
+                    } else {
+                        goingBacks++;
                     }
                     solution = prevSolution;
                 }
             }
             else {
                 goingBacks++;
+            }
+        }
+    }
+
+    public void ff(Solution solution, int index) {
+        initialDomainRemoval(solution);
+        fc(solution, index);
+    }
+
+    public void fc(Solution solution, int index) {
+        for (Integer value : solution.getDomainForVariable(index)) {
+            Solution copy = solution.getCopy();
+            copy.set(index, value);
+            nodesVisited++;
+
+            copy.removeImpossibleDomains(index, value);
+            if (!copy.hasEmptyDomain()) {
+                fc(copy, copy.getNextIndex(index));
+            }
+            else {
+                goingBacks++;
+            }
+
+            if (copy.isSolutionFinal()) {
+                copy.print();
+                numberOfSolutions++;
             }
         }
     }
@@ -111,6 +142,8 @@ public class ProblemSolver {
                     solution.removeImpossibleDomains(index, domain.get(i));
                     if (!solution.hasEmptyDomain()) {
                         solutionFound = forwardCheckingUntilFirstSolution(solution, solution.getNextIndex(index));
+                    } else {
+                        goingBacks++;
                     }
                     solution = prevSolution;
                 }

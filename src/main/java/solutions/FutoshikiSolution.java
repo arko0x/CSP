@@ -100,7 +100,7 @@ public class FutoshikiSolution implements Solution {
             }
         }
 
-        for (int i = column; i <= this.n; i += n) {
+        for (int i = column; i < this.n * n; i += n) {
             if (variables.get(i) == null && i != index) {
                 for (Integer domValue : domain.get(i)) {
                     set(i, domValue);
@@ -240,7 +240,7 @@ public class FutoshikiSolution implements Solution {
             }
         }
 
-        for (int i = column; i <= this.n; i += n) {
+        for (int i = column; i < this.n * n; i += n) {
             if (variables.get(i) == null) {
                 List<Integer> localDomain = domain.get(i);
                 for (int j = 0; j < localDomain.size(); j++) {
